@@ -1,27 +1,16 @@
 [project]
-name = "anomalib-test"
+name = "anomalib-app"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
-    "anomalib[clip,notebooks,openvino]>=2.0.0",
-    "comet-ml>=3.52.1",
-    "einops>=0.8.1",
-    "freia>=0.2",
-    "kornia>=0.8.1",
-    "lightning>=2.5.5",
+    "anomalib[cu124,loggers,notebooks,openvino]==2.2.0",
     "markupsafe==2.1.5",
-    "ollama>=0.5.3",
-    "open-clip-torch>=3.1.0",
-    "opencv-python>=4.12.0.88",
-    "python-dotenv>=1.1.1",
-    "scikit-image>=0.25.2",
-    "streamlit>=1.49.1",
-    "tifffile>=2025.8.28",
-    "torch==2.7.1+cu128",
-    "torchvision==0.22.1+cu128",
+    "streamlit>=1.55.0",
+    "torch>=2.6.0",
+    "torchvision>=0.21.0",
 ]
 
 [[tool.uv.index]]
-url = "https://download.pytorch.org/whl/cu128"
+url = "https://download.pytorch.org/whl/cu124"

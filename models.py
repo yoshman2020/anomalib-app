@@ -2,6 +2,7 @@
 from typing import Any
 
 import timm
+import torch
 from anomalib.metrics import Evaluator
 from anomalib.models import (
     Cfa,
@@ -213,7 +214,7 @@ def get_model(
             visualizer=visualizer,
             enable_sspcab=False,
             sspcab_lambda=0.1,
-            anomaly_source_path=None,
+            # anomaly_source_path=None,
             beta=(0.1, 1.0),
         )
         # max_epochs = 700

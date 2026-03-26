@@ -199,3 +199,255 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+============================================================
+THIRD-PARTY SOFTWARE NOTICES AND LICENSES
+============================================================
+
+This software includes third-party open source software components.
+
+1. absl-py 1.4.0
+   License: Apache 2.0
+   URL: https://github.com/abseil/abseil-py/blob/master/LICENSE
+
+2. aiofiles 23.1.0
+   License: MIT
+   URL: https://github.com/Tinche/aiofiles/blob/master/LICENSE
+
+3. aiohttp 3.9.4
+   License: Apache 2.0
+   URL: https://github.com/aio-libs/aiohttp/blob/main/LICENSE
+
+4. attrs 23.1.0
+   License: MIT
+   URL: https://www.attrs.org/en/stable/overview.html#license
+
+5. altair 5.0.1
+   License: BSD 3-Clause
+   URL: https://github.com/altair-viz/altair/blob/master/LICENSE
+
+6. fastapi 0.95.2
+   License: MIT
+   URL: https://github.com/tiangolo/fastapi/blob/master/LICENSE
+
+7. flask 2.3.3
+   License: BSD 3-Clause
+   URL: https://github.com/pallets/flask/blob/main/LICENSE.rst
+
+8. pandas 2.1.1
+   License: BSD 3-Clause
+   URL: https://pandas.pydata.org/docs/license.html
+
+9. numpy 1.24.4
+   License: BSD 3-Clause "New" or "Revised" License
+   URL: https://numpy.org/license.html
+
+10. requests 2.31.0
+    License: Apache 2.0
+    URL: https://github.com/psf/requests/blob/main/LICENSE
+
+11. scikit-learn 1.3.0
+    License: BSD 3-Clause
+    URL: https://github.com/scikit-learn/scikit-learn/blob/main/COPYING
+
+12. scipy 1.11.0
+    License: BSD 3-Clause
+    URL: https://www.scipy.org/scipylib/license.html
+
+13. protobuf 4.24.0
+    License: BSD 3-Clause
+    URL: https://github.com/protocolbuffers/protobuf/blob/main/LICENSE
+
+14. sqlalchemy 2.0.21
+    License: MIT
+    URL: https://github.com/sqlalchemy/sqlalchemy/blob/main/LICENSE
+
+15. streamlit 1.26.0
+    License: Apache 2.0
+    URL: https://github.com/streamlit/streamlit/blob/develop/LICENSE
+
+16. uvicorn 0.23.2
+    License: MIT
+    URL: https://www.uvicorn.org/license/
+
+17. torch 2.1.0
+    License: BSD-style (PyTorch)
+    URL: https://github.com/pytorch/pytorch/blob/master/LICENSE
+
+18. torchvision 0.16.1
+    License: BSD-style (PyTorch)
+    URL: https://github.com/pytorch/vision/blob/main/LICENSE
+
+19. timm 0.9.1
+    License: Apache 2.0
+    URL: https://github.com/rwightman/pytorch-image-models/blob/master/LICENSE
+
+20. rich 13.4.2
+    License: MIT
+    URL: https://github.com/Textualize/rich/blob/master/LICENSE
+
+21. jinja2 3.1.3
+    License: BSD 3-Clause
+    URL: https://github.com/pallets/jinja/blob/main/LICENSE
+
+22. pydantic 2.5.2
+    License: MIT
+    URL: https://github.com/pydantic/pydantic/blob/main/LICENSE
+
+23. pillow 10.0.1
+    License: PIL-style / BSD
+    URL: https://pillow.readthedocs.io/en/stable/releasenotes/10.0.0.html#license
+
+24. matplotlib 3.8.1
+    License: PSF / BSD
+    URL: https://matplotlib.org/stable/users/license.html
+
+25. notebook 7.5.2
+    License: BSD 3-Clause
+    URL: https://github.com/jupyter/notebook/blob/main/LICENSE
+
+26. jupyterlab 4.2.3
+    License: BSD 3-Clause
+    URL: https://github.com/jupyterlab/jupyterlab/blob/main/LICENSE
+
+27. gitpython 3.1.32
+    License: BSD 3-Clause
+    URL: https://github.com/gitpython-developers/GitPython/blob/main/LICENSE
+
+---
+
+## MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is furnished
+to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+## Apache License 2.0
+
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+   "License" shall mean the terms and conditions for use, reproduction, and distribution.
+
+2. Grant of Copyright License.
+   Each Contributor grants a perpetual, worldwide, non-exclusive, no-charge, royalty-free copyright license.
+
+3. Grant of Patent License.
+   Each Contributor grants a patent license to make, use, sell, and distribute the Work.
+
+4. Redistribution.
+   You must give recipients a copy of this License and retain notices.
+
+5. Submission of Contributions.
+   Unless stated otherwise, contributions are under this License.
+
+6. Trademarks.
+   This License does not grant trademark rights.
+
+7. Disclaimer of Warranty.
+   THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTIES.
+
+8. Limitation of Liability.
+   NO CONTRIBUTOR SHALL BE LIABLE FOR DAMAGES.
+
+---
+
+## BSD 3-Clause License
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions must retain the copyright notice.
+2. Redistributions in binary form must reproduce the notice.
+3. Neither the name of the copyright holder nor contributors may be used
+   to endorse or promote products without permission.
+
+THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+
+---
+
+## BSD 2-Clause License
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that:
+
+1. Redistributions must retain the copyright notice.
+2. Redistributions in binary form must reproduce the notice.
+
+THIS SOFTWARE IS PROVIDED "AS IS".
+
+---
+
+## ISC License
+
+Permission to use, copy, modify, and/or distribute this software for any purpose
+with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES.
+
+---
+
+## Python Software Foundation License
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+
+1. This LICENSE AGREEMENT is between the Python Software Foundation (PSF) and the Individual or Organization.
+
+2. Subject to the terms, PSF grants a nonexclusive license to reproduce and distribute Python.
+
+3. PSF makes no representations or warranties.
+
+4. PSF shall not be liable for damages.
+
+---
+
+## PyTorch License (BSD-style + Patents)
+
+Copyright (c) Facebook, Inc. and its affiliates.
+
+Redistribution and use in source and binary forms are permitted.
+
+This license includes a patent grant.
+
+THE SOFTWARE IS PROVIDED "AS IS".
+
+---
+
+## NVIDIA CUDA Components Notice
+
+This product includes NVIDIA CUDA libraries.
+
+Use, reproduction, and distribution are subject to the NVIDIA CUDA Toolkit EULA:
+https://docs.nvidia.com/cuda/eula/index.html
+
+You must comply with NVIDIA's terms when distributing binaries.
+
+---
+
+## IMPORTANT NOTICE
+
+* This software includes dependencies such as PyTorch and CUDA which may include additional restrictions.
+* You must comply with all third-party licenses when redistributing.
+* This file aggregates licenses but does not replace original license files.
+
+============================================================
+END OF LICENSE
+============================================================

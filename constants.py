@@ -1,7 +1,11 @@
+from pathlib import Path
+
 # 選択した画像の保存フォルダ
 DATASET_PATH = "./datasets/uploaded"
 # 検査結果フォルダ
 RESULT_PATH = "./results"
+# モデルファイル
+MODEL_PATH = Path(RESULT_PATH) / "weights" / "torch" / "model.pt"
 # バッチサイズ
 BATCH_SIZE = 1
 

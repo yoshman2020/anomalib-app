@@ -17,6 +17,9 @@
                 // "8501",
             ],
             "justMyCode": false,
+            "env": {
+                "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
+            }
         },
         {
             "name": "Python Debugger: Current File",
