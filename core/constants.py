@@ -9,6 +9,10 @@ MODEL_PATH = Path(RESULT_PATH) / "weights" / "torch" / "model.pt"
 # バッチサイズ
 BATCH_SIZE = 1
 
+# 画像表示カラムの高さ
+COLUMN_HEIGHT = 300
+COLUMN_HEIGHT_RESULT = 500
+
 # 検査手法リスト
 MODEL_NAMES = [
     # 0 # △一般に高速（データ規模依存） # 観測変数の因子構造を検証する統計的手法(Continuous Flow Analysis)

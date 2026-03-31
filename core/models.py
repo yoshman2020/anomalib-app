@@ -37,7 +37,7 @@ from anomalib.pre_processing import PreProcessor
 from anomalib.visualization import Visualizer
 from torchvision.transforms.v2 import Compose, Resize
 
-import constants
+import core.constants as constants
 
 
 class FreEx(Fre):
