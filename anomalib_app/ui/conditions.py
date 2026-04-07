@@ -1,7 +1,11 @@
+import logging
+
 import pandas as pd
 import streamlit as st
 
-import core.constants as constants
+import anomalib_app.core.constants as constants
+
+logger = logging.getLogger(__name__)
 
 
 def configure_conditions(tab_conditions) -> bool:
@@ -19,12 +23,12 @@ def configure_conditions(tab_conditions) -> bool:
     Returns:
         bool: True if the form is submitted ("検査開始" button pressed), otherwise False.
     """
-    print("configure_conditions called")
+    logger.debug("configure_conditions called")
     with tab_conditions:
-        st.markdown("## :level_slider: 検査条件")
-
         # モデルファイル
-        col_model_file_1, col_model_file_2 = st.columns([2, 8])
+        col_model_file_1, col_model_file_2 = st.columns(
+            [2, 8], vertical_alignment="center"
+        )
         with col_model_file_1:
             chk_model_file = st.checkbox(
                 "モデルファイル使用",
@@ -84,7 +88,9 @@ def configure_conditions(tab_conditions) -> bool:
                 st.table(df)
 
             with col_model_name_2:
-                if st.button("?", key="button_about_model_name"):
+                if st.button(
+                    "?", key="button_about_model_name", help="検査手法について"
+                ):
                     about_model_name()
         with col_name_backbone_2:
             # モデル（バックボーン）
@@ -106,13 +112,20 @@ def configure_conditions(tab_conditions) -> bool:
                 st.table(df)
 
             with col_backbone_2:
-                if st.button("?", key="button_about_backbone"):
+                if st.button(
+                    "?", key="button_about_backbone", help="モデルについて"
+                ):
                     about_backbone()
 
-        # しきい値、縮小サイズ、学習サイズ
-        col_sizes_1, col_sizes_2, col_sizes_3, col_sizes_4 = st.columns(
-            [1, 3, 3, 3]
-        )
+        # しきい値、縮小サイズ、学習サイズ、バッチサイズ、ワーカー数
+        (
+            col_sizes_1,
+            col_sizes_2,
+            col_sizes_3,
+            col_sizes_4,
+            col_sizes_5,
+            col_sizes_6,
+        ) = st.columns(6)
         with col_sizes_1:
             threshold_auto = st.checkbox(
                 "自動しきい値",
@@ -147,6 +160,24 @@ def configure_conditions(tab_conditions) -> bool:
                 help="指定した回数学習します。",
                 disabled=chk_model_file,
             )
+        with col_sizes_5:
+            st.number_input(
+                "バッチサイズ",
+                value=1,
+                min_value=1,
+                key="batch_size",
+                help="一度に処理する枚数を指定します。",
+                disabled=chk_model_file,
+            )
+        with col_sizes_6:
+            st.number_input(
+                "ワーカー数",
+                value=0,
+                min_value=0,
+                key="num_workers",
+                help="データローダーのワーカー数を指定します。通常は0で問題ありません。現在は0のみ選択可能です。",
+                disabled=True,
+            )
 
         # 異常画像、マスク画像
         col_abnormal_mask_1, col_abnormal_mask_2 = st.columns(2)
@@ -169,9 +200,45 @@ def configure_conditions(tab_conditions) -> bool:
                 disabled=chk_model_file,
             )
 
+        col_metrics_1, col_metrics_2, col_metrics_3, col_metrics_4 = st.columns(
+            4
+        )
+        with col_metrics_1:
+            chk_disp_metrics = st.checkbox(
+                "パフォーマンス表示",
+                key="chk_disp_metrics",
+                value=True,
+                help="検査結果とともに、混同行列、AUROC、AUPIMOを表示します。",
+                disabled=chk_model_file,
+            )
+        with col_metrics_2:
+            _ = st.checkbox(
+                "混同行列（Confusion Matrix）表示",
+                key="chk_disp_confusion_matrix",
+                value=True,
+                help="混同行列を表示します。",
+                disabled=chk_model_file or not chk_disp_metrics,
+            )
+        with col_metrics_3:
+            _ = st.checkbox(
+                "AUROC表示",
+                key="chk_disp_auroc",
+                value=True,
+                help="AUROCを表示します。",
+                disabled=chk_model_file or not chk_disp_metrics,
+            )
+        with col_metrics_4:
+            _ = st.checkbox(
+                "AUPIMO表示",
+                key="chk_disp_aupimo",
+                value=True,
+                help="AUPIMOを表示します。",
+                disabled=chk_model_file or not chk_disp_metrics,
+            )
+
         submitted = st.button(
             "検査開始", type="primary", width="content", key="submitted"
         )
 
-    print("configure_conditions finished")
+    logger.debug("configure_conditions finished")
     return submitted

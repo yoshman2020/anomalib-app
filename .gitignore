@@ -212,3 +212,8 @@ results
 /pre_trained
 *.pt
 .tmp/
+dist/
+build/
+*.c
+_internal/
+dist_prep/

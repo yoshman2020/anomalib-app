@@ -1,0 +1,6 @@
+{
+    "company_name": "Your Company Name",
+    "app_title": "AI異常検知",
+    "version": "1.0.0",
+    "log_level": "DEBUG"
+}

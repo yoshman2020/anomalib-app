@@ -1,17 +1,28 @@
+# import sys
+import logging
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
+
+def get_base_path() -> Path:
+    """EXE実行時とpy実行時で、リソースファイルのパスの基準が異なるため、両方に対応する関数"""
+    return Path(__file__).parent.parent.parent
+
+
+BASE_PATH = get_base_path()
 # 選択した画像の保存フォルダ
-DATASET_PATH = "./datasets/uploaded"
+DATASET_PATH = BASE_PATH / "datasets" / "uploaded"
 # 検査結果フォルダ
-RESULT_PATH = "./results"
+RESULT_PATH = BASE_PATH / "results"
 # モデルファイル
-MODEL_PATH = Path(RESULT_PATH) / "weights" / "torch" / "model.pt"
+MODEL_PATH = BASE_PATH / RESULT_PATH / "weights" / "torch" / "model.pt"
 # バッチサイズ
 BATCH_SIZE = 1
 
 # 画像表示カラムの高さ
 COLUMN_HEIGHT = 300
-COLUMN_HEIGHT_RESULT = 500
+COLUMN_HEIGHT_RESULT = 350
 
 # 検査手法リスト
 MODEL_NAMES = [

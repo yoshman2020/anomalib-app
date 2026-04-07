@@ -1,6 +1,10 @@
+import logging
+
 import streamlit as st
 
-from core import constants
+from anomalib_app.core import constants
+
+logger = logging.getLogger(__name__)
 
 
 def is_input_ok(has_abnormal: bool) -> bool:
@@ -13,7 +17,7 @@ def is_input_ok(has_abnormal: bool) -> bool:
     Returns:
         bool: True if all required inputs are provided; False otherwise. Displays error messages in the Streamlit UI if inputs are missing.
     """
-    print("is_input_ok called")
+    logger.debug("is_input_ok called")
     if st.session_state["chk_model_file"]:
         # モデルファイル使用
         if st.session_state["model_file"] is None:
@@ -52,5 +56,5 @@ def is_input_ok(has_abnormal: bool) -> bool:
     ):
         st.error("異常画像とマスク画像はセットで選択してください。", icon="❌")
         return False
-    print("is_input_ok finished")
+    logger.debug("is_input_ok finished")
     return True

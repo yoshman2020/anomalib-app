@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import logging
 from typing import Any
 
 import timm
-import torch
 from anomalib.metrics import Evaluator
 from anomalib.models import (
     Cfa,
@@ -37,7 +37,7 @@ from anomalib.pre_processing import PreProcessor
 from anomalib.visualization import Visualizer
 from torchvision.transforms.v2 import Compose, Resize
 
-import core.constants as constants
+logger = logging.getLogger(__name__)
 
 
 class FreEx(Fre):
@@ -95,6 +95,7 @@ def get_model(
     backbone: str,
     image_size: int = 256,
     max_epochs: int = 1,
+    batch_size: int = 1,
 ) -> AnomalibModule:
     """
     Creates and returns an anomaly detection model based on the specified model name and backbone.
@@ -105,6 +106,8 @@ def get_model(
             "VLM-AD", "WinCLIP".
         backbone (str): The name of the backbone neural network architecture to use for feature extraction.
         image_size (int, optional): The size to which input images will be resized. Defaults to 256.
+        max_epochs (int, optional): The maximum number of training epochs. Defaults to 1.
+        batch_size (int, optional): The batch size for training. Defaults to 1.
     Returns:
         AnomalibModule: An instance of the specified anomaly detection model, configured with the given backbone
         and preprocessing settings.
@@ -117,7 +120,7 @@ def get_model(
     else:
         feature_model = timm.create_model(backbone, features_only=True)
         layers = feature_model.feature_info.module_name()  # type: ignore
-        print(layers)
+        logger.debug(layers)
 
     # 前処理の設定
     transform = Compose([Resize((image_size, image_size))])
@@ -153,7 +156,7 @@ def get_model(
             evaluator=evaluator,
             visualizer=visualizer,
             layers=layers[-3:],
-            fiber_batch_size=constants.BATCH_SIZE,
+            fiber_batch_size=batch_size,
             pre_trained=True,
             decoder="freia-cflow",
             condition_vector=128,

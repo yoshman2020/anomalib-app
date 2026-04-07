@@ -1,5 +1,7 @@
+import copy
 import csv
 import io
+import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -8,46 +10,54 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
-from core import constants
-from core.image_utils import superimpose_anomaly_map_g
-from core.list_utils import get_item
+from anomalib_app.core import constants
+from anomalib_app.core.image_utils import superimpose_anomaly_map_g
+from anomalib_app.core.list_utils import get_item
+
+logger = logging.getLogger(__name__)
 
 
 def init_results():
     """
     Initializes session state variables for storing test images, heat maps, image paths, result strings, and threshold value in a Streamlit application.
     """
-    print("init_results called")
+    logger.debug("init_results called")
     st.session_state["heat_maps"] = []
     st.session_state["test_image_path"] = []
     st.session_state["str_results"] = []
     st.session_state["str_threshold"] = ""
-    print("init_results finished")
+    st.session_state["train_images_used"] = []
+    st.session_state["test_images_used"] = []
+    logger.debug("init_results finished")
 
 
-@st.cache_data
-def create_result_data_cached(_predictions, _threshold):
+def create_result_data(predictions, threshold):
     """
     Compute heat maps, result strings, file paths, and ZIP/CSV for predictions.
     Stores everything in st.session_state for later display.
 
     Args:
-        _predictions (list[ImageBatch]): List of prediction objects.
-        _threshold (float): Threshold for judging normal vs anomalous.
+        predictions (list[ImageBatch]): List of prediction objects.
+        threshold (float): Threshold for judging normal vs anomalous.
     """
-    if _predictions is None:
+    logger.debug("create_result_data called")
+    if predictions is None:
         return
 
     # 初期化
-    st.session_state["heat_maps"] = []
-    st.session_state["test_image_path"] = []
-    st.session_state["str_results"] = []
-    st.session_state["str_threshold"] = f"しきい値: {_threshold:.5f}"
+    init_results()
+    st.session_state["str_threshold"] = f"しきい値: {threshold:.5f}"
+    st.session_state["train_images_used"] = copy.deepcopy(
+        st.session_state["train_images"]
+    )
+    st.session_state["test_images_used"] = copy.deepcopy(
+        st.session_state["test_images"]
+    )
 
-    images = st.session_state.get("test_images", [])
+    images = st.session_state["test_images_used"]
 
     # ヒートマップ用の最小・最大値取得
-    map_min, map_max, map_ptp = get_map_min_max(_predictions)
+    map_min, map_max, map_ptp = get_map_min_max(predictions)
 
     # CSV用メモリバッファ
     csv_buffer = io.StringIO()
@@ -61,7 +71,7 @@ def create_result_data_cached(_predictions, _threshold):
             "モデル",
             st.session_state.get("backbone", ""),
             "しきい値",
-            _threshold,
+            threshold,
         ]
     )
     csv_writer.writerow(["ファイル名", "スコア", "判定"])
@@ -75,13 +85,13 @@ def create_result_data_cached(_predictions, _threshold):
     items_per_row = select_column_count // group_size
 
     with zipfile.ZipFile(zip_path, "w") as zipf:
-        for i in range(0, len(_predictions), items_per_row):
+        for i in range(0, len(predictions), items_per_row):
             for j in range(items_per_row):
                 idx = i + j
-                if idx >= len(_predictions):
+                if idx >= len(predictions):
                     break
 
-                prediction = _predictions[idx]
+                prediction = predictions[idx]
                 image = images[idx]
                 # base_col = j * group_size
 
@@ -95,7 +105,7 @@ def create_result_data_cached(_predictions, _threshold):
 
                 # 予測スコアと判定
                 pred_score = get_item(prediction, "pred_score") or 0.0
-                judge = "異常" if pred_score > _threshold else "正常"
+                judge = "異常" if pred_score > threshold else "正常"
                 str_results = f"score:{pred_score:.5f} [{judge}]"
                 st.session_state["str_results"].append(str_results)
 
@@ -141,6 +151,8 @@ def create_result_data_cached(_predictions, _threshold):
     # ZIPのパスも保存しておく
     st.session_state["zip_path"] = zip_path
 
+    logger.debug("create_result_data finished")
+
 
 def get_map_min_max(predictions) -> tuple[float, float, float]:
     """
@@ -155,7 +167,7 @@ def get_map_min_max(predictions) -> tuple[float, float, float]:
             - map_max (float): The maximum value found across all anomaly maps.
             - map_ptp (float): The range (max - min) of the anomaly map values.
     """
-    print("get_map_min_max called")
+    logger.debug("get_map_min_max called")
     if (
         predictions is None
         or len(predictions) == 0
@@ -172,5 +184,5 @@ def get_map_min_max(predictions) -> tuple[float, float, float]:
         for prediction in predictions
     )
     map_ptp = map_max - map_min
-    print("get_map_min_max finished")
+    logger.debug("get_map_min_max finished")
     return map_min, map_max, map_ptp

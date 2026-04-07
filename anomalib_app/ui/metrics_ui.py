@@ -1,26 +1,16 @@
-from typing import cast
+import logging
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import streamlit as st
-import torch
-from anomalib.data import ImageBatch
-from anomalib.metrics import AUPIMO, AUROC, F1Max, F1Score
-from matplotlib.ticker import MaxNLocator, PercentFormatter
-from scipy import stats
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    accuracy_score,
-    confusion_matrix,
-    precision_score,
-    recall_score,
-)
+
+from anomalib_app.core.metrics import run_metrics_if_needed
+
+logger = logging.getLogger(__name__)
 
 
-def disp_metrix_about_button(tab, metrix_containers):
+def disp_metrics_about_button(tab, metrics_containers):
     """Displays information buttons for confusion matrix, AUROC, and AUPIMO metrics."""
-    with metrix_containers[0]:
+    with metrics_containers[0]:
 
         @st.dialog("混同行列（Confusion Matrix）とは", width="large")
         def about_confution_matrix():
@@ -46,11 +36,11 @@ def disp_metrix_about_button(tab, metrix_containers):
             )
             st.write(
                 "この表から、モデルの性能を以下の指標で評価できます。\n",
+                "- 正解率（Accuracy）: (TP + TN) / (TP + TN + FP + FN)\n",
                 "- 再現率（Recall）: TP / (TP + FN)\n",
                 "- 適合率（Precision）: TP / (TP + FP)\n",
                 "- F1 Score: 2 * (Precision * Recall) / (Precision + Recall)\n",
                 "- F1 Max: しきい値を動かしたときに得られる最大のF1 Score\n",
-                "- 正解率（Accuracy）: (TP + TN) / (TP + TN + FP + FN)\n",
             )
             st.write(
                 "再現率は、異常なものをどれだけ見つけられたかの割合です。異常を一つでも取りこぼしたくない場合、この値を100%に近づけます。<br />"
@@ -58,10 +48,14 @@ def disp_metrix_about_button(tab, metrix_containers):
                 unsafe_allow_html=True,
             )
 
-        if st.button("?", key="button_about_confution_matrix"):
+        if st.button(
+            "?",
+            key="button_about_confution_matrix",
+            help="混同行列（Confusion Matrix）とは",
+        ):
             about_confution_matrix()
 
-    with metrix_containers[1]:
+    with metrics_containers[1]:
 
         @st.dialog("AUROCとは", width="large")
         def about_auroc():
@@ -74,10 +68,10 @@ def disp_metrix_about_button(tab, metrix_containers):
                 unsafe_allow_html=True,
             )
 
-        if st.button("?", key="button_about_auroc"):
+        if st.button("?", key="button_about_auroc", help="AUROCとは"):
             about_auroc()
 
-    with metrix_containers[2]:
+    with metrics_containers[2]:
 
         @st.dialog("AUPIMOとは", width="large")
         def about_aupimo():
@@ -121,153 +115,11 @@ def disp_metrix_about_button(tab, metrix_containers):
             )
             st.dataframe(df, hide_index=True)
 
-        if st.button("?", key="button_about_aupimo"):
+        if st.button("?", key="button_about_aupimo", help="AUPIMOとは"):
             about_aupimo()
 
-@st.cache_data
-def calc_all_metrics(_predictions: list[ImageBatch]) -> dict:
-    """Calculate all metrics for the given predictions.
 
-    Args:
-        _predictions (list[ImageBatch]): _description_
-
-    Returns:
-        dict: A dictionary containing the calculated metrics.
-    """
-
-    fig_cm = None
-    accuracy = None
-    df_score = None
-    fig_auroc = None
-    fig_hist = None
-    df_desc = None
-    haserrors = [False, False, False]
-
-    # ===== 混同行列 =====
-    try:
-        all_preds = []
-        all_labels = []
-
-        for batch in _predictions:
-            # それぞれ Tensor を想定 GPU対策 + listに追加
-            all_preds.append(batch.pred_label.detach().cpu()) # type: ignore
-            all_labels.append(batch.gt_label.detach().cpu()) # type: ignore
-
-        # 連結
-        y_pred = torch.cat(all_preds).numpy()
-        y_true = torch.cat(all_labels).numpy()
-
-        # ===== confusion matrix =====
-        cm = confusion_matrix(y_true, y_pred)
-        fig_cm, ax = plt.subplots()
-        ConfusionMatrixDisplay(cm).plot(ax=ax)
-
-        # ===== scores =====
-        recall = recall_score(y_true, y_pred)
-        precision = precision_score(y_true, y_pred)
-        accuracy = accuracy_score(y_true, y_pred)
-
-        f1 = F1Score(fields=["pred_score", "gt_label"])
-        f1_max = F1Max(fields=["pred_score", "gt_label"])
-        for batch in _predictions:
-            f1.update(batch)
-            f1_max.update(batch)
-        f1_score = f1.compute()
-        f1_max_score = f1_max.compute()
-
-        df_score = pd.DataFrame(
-            {
-                "正解率（Accuracy）": [f"{accuracy:.5f}"],
-                "再現率（Recall）": [f"{recall:.5f}"],
-                "適合率（Precision）": [f"{precision:.5f}"],
-                "F1 Score": [f"{f1_score:.5f}"],
-                "F1 Max": [f"{f1_max_score:.5f}"],
-            },
-            index=["値"],
-        ).T
-    except Exception as e:
-        print(e)
-        print(type(e))
-        haserrors[0] = True
-
-    # ===== AUROC =====
-    try:
-        # Calculate AUROC
-        auroc = AUROC(fields=["pred_score", "gt_label"])
-        for batch in _predictions:
-            auroc.update(batch)
-
-        fig_auroc, _ = auroc.generate_figure()
-
-    except Exception as e:
-        print(e)
-        print(type(e))
-        haserrors[1] = True
-
-    # ===== AUPIMO =====
-    try:
-
-        aupimo = AUPIMO(return_average=False)
-        for batch in _predictions:
-            aupimo.update(batch)
-
-        _, aupimo_result = aupimo.compute()
-        isnan = torch.isnan(aupimo_result.aupimos) # type: ignore
-
-        descriptive = stats.describe(aupimo_result.aupimos[~isnan]) # type: ignore
-
-        df_desc = pd.DataFrame([descriptive], columns=descriptive._fields)
-        df_desc["minmax"] = df_desc["minmax"].apply(lambda x: f"{x[0]},{x[1]}")
-        df_desc = df_desc.T
-        df_desc.columns = ["value"]
-        df_desc["value"] = df_desc["value"].astype(str)
-
-        fig_hist, ax = plt.subplots()
-        ax.hist(
-            aupimo_result.aupimos.numpy(), # type: ignore
-            bins=np.linspace(0, 1, 11), # type: ignore
-            edgecolor="black",
-        )
-        ax.set_ylabel("Count")
-        ax.yaxis.set_major_locator(MaxNLocator(5, integer=True))
-        ax.set_xlim(0, 1)
-        ax.set_xlabel("AUPIMO [%]")
-        ax.xaxis.set_major_formatter(PercentFormatter(1))
-        ax.grid()
-    except Exception as e:
-        print(e)
-        print(type(e))
-        haserrors[2] = True
-
-    return {
-        "fig_cm": fig_cm,
-        "accuracy": accuracy,
-        "df_score": df_score,
-        "fig_auroc": fig_auroc,
-        "fig_aupimo": fig_hist,
-        "df_aupimo": df_desc,
-        "haserrors": haserrors,
-    }
-
-def run_metrics_if_needed():
-    """Run metrics calculation if needed."""
-    if "metrics" not in st.session_state:
-        st.session_state["metrics"] = None
-
-    predictions = st.session_state.get("train_predictions")
-
-    # ===== 自動リセット =====
-    if "prev_predictions" not in st.session_state:
-        st.session_state["prev_predictions"] = None
-
-    if st.session_state["prev_predictions"] is not predictions:
-        st.session_state["metrics"] = None
-        st.session_state["prev_predictions"] = predictions
-
-    if predictions and st.session_state["metrics"] is None:
-        st.session_state["metrics"] = calc_all_metrics(predictions)
-
-def disp_metrics(tab_metrics, metrix_containers) -> None:
+def disp_metrics(tab_metrics, metrics_containers) -> None:
     """
     Calculates and displays the AUROC metric for a list of predictions in a Streamlit app.
 
@@ -284,11 +136,11 @@ def disp_metrics(tab_metrics, metrix_containers) -> None:
         - Handles cases where predictions are None or empty.
     """
 
-    print("disp_metrics called")
+    logger.debug("disp_metrics called")
 
     with tab_metrics:
         if st.session_state["chk_model_file"]:
-            print("No predictions to calculate AUROC.")
+            logger.debug("No predictions to calculate AUROC.")
             st.info(
                 "モデルファイルを使用した場合は、パフォーマンスは表示されません。"
             )
@@ -300,6 +152,10 @@ def disp_metrics(tab_metrics, metrix_containers) -> None:
             )
             return
 
+        if not st.session_state["chk_disp_metrics"]:
+            st.info("指定した条件では、パフォーマンスは表示されません。")
+            return
+
         run_metrics_if_needed()
         result = st.session_state.get("metrics")
 
@@ -307,24 +163,27 @@ def disp_metrics(tab_metrics, metrix_containers) -> None:
             st.info("指定した条件では、パフォーマンスは表示されません。")
             return
 
-    with metrix_containers[0]:
-        if result["haserrors"][0]:
+    with metrics_containers[0]:
+        if (
+            not st.session_state["chk_disp_confusion_matrix"]
+            or result["haserrors"][0]
+        ):
             st.info("指定した条件では、混同行列は表示されません。")
         else:
             st.pyplot(result["fig_cm"])
             st.table(result["df_score"])
 
-    with metrix_containers[1]:
-        if result["haserrors"][1]:
+    with metrics_containers[1]:
+        if not st.session_state["chk_disp_auroc"] or result["haserrors"][1]:
             st.info("指定した条件では、AUROCは表示されません。")
         else:
             st.pyplot(result["fig_auroc"])
 
-    with metrix_containers[2]:
-        if result["haserrors"][2]:
+    with metrics_containers[2]:
+        if not st.session_state["chk_disp_aupimo"] or result["haserrors"][2]:
             st.info("指定した条件では、AUPIMOは表示されません。")
         else:
             st.pyplot(result["fig_aupimo"])
             st.dataframe(result["df_aupimo"])
 
-    print("disp_metrics finished")
+    logger.debug("disp_metrics finished")

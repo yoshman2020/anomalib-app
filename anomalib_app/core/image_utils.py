@@ -1,5 +1,9 @@
+import logging
+
 import cv2
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def superimpose_anomaly_map_g(
@@ -23,7 +27,7 @@ def superimpose_anomaly_map_g(
     Returns:
         np.ndarray: Superimposed image.
     """
-    print("superimpose_anomaly_map_g called")
+    logger.debug("superimpose_anomaly_map_g called")
     assert anomaly_map.shape == image.shape[:2], (
         f"Anomaly map shape {anomaly_map.shape} does not match image shape "
         f"{image.shape[:2]}."
@@ -33,5 +37,5 @@ def superimpose_anomaly_map_g(
     rgb_color_map = cv2.cvtColor(color_map, cv2.COLOR_BGR2RGB)
     height, width = rgb_color_map.shape[:2]
     image = cv2.resize(image, (width, height))
-    print("superimpose_anomaly_map_g finished")
+    logger.debug("superimpose_anomaly_map_g finished")
     return cv2.addWeighted(rgb_color_map, alpha, image, (1 - alpha), gamma)

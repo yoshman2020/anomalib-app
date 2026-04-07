@@ -12,14 +12,21 @@
             "console": "integratedTerminal",
             "args": [
                 "run",
-                "streamlit_app.py",
-                // "--server.port",
-                // "8501",
+                "anomalib_app\\streamlit_app.py",
+                "--server.port",
+                "8502",
             ],
             "justMyCode": false,
             "env": {
                 "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
             }
+        },
+        {
+            "name": "Run Streamlit via run_app.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_app.py",
+            "console": "integratedTerminal"
         },
         {
             "name": "Python Debugger: Current File",

@@ -1,5 +1,9 @@
+import logging
+
 import numpy as np
 import torch
+
+logger = logging.getLogger(__name__)
 
 
 def get_item(prediction, key):
@@ -16,7 +20,7 @@ def get_item(prediction, key):
             - For other types (int, float, etc.): returns the value directly.
         Returns None if the attribute does not exist.
     """
-    print(f"get_item called for key: {key}")
+    logger.debug(f"get_item called for key: {key}")
     if not hasattr(prediction, key):
         return None
 
@@ -42,6 +46,6 @@ def get_item(prediction, key):
             return val.item()
         return val.flat[0]  # flat iteratorで最初の要素
 
-    print("get_item finished")
+    logger.debug("get_item finished")
     # それ以外（int, float, etc.）
     return val

@@ -12,8 +12,8 @@ This repository is for testing and experimenting with [Anomalib](https://github.
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com//anomalib-test.git
-    cd anomalib-test
+    git clone https://github.com//anomalib-app.git
+    cd anomalib-app
     ```
 
 2. **Install dependencies:**

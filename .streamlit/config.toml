@@ -1,0 +1,7 @@
+[global]
+developmentMode = false
+enableCORS = false
+enableXsrfProtection = false
+
+[server]
+port = 8501

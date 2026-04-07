@@ -1,10 +1,13 @@
+import logging
 import shutil
 from pathlib import Path
 
 import streamlit as st
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 
-from core import constants
+from anomalib_app.core import constants
+
+logger = logging.getLogger(__name__)
 
 
 def save_images_to_dir(images: list[UploadedFile], directory: Path):
@@ -21,13 +24,13 @@ def save_images_to_dir(images: list[UploadedFile], directory: Path):
     Raises:
         OSError: If the image cannot be written to disk.
     """
-    print("save_images_to_dir called")
+    logger.debug(f"save_images_to_dir called with directory: {directory}")
     directory.mkdir(parents=True, exist_ok=True)
     for i, image in enumerate(images):
         image_name = "_".join(Path(image.name).parts)
         with open(directory / f"{i:04}.{image_name}", "wb") as f:
             f.write(image.getvalue())
-    print("save_images_to_dir finished")
+    logger.debug("save_images_to_dir finished")
 
 
 def save_images(
@@ -54,12 +57,12 @@ def save_images(
     Note:
         The function relies on global constants for dataset and result paths, and session state for abnormal image detection.
     """
-    print("save_images called")
+    logger.debug("save_images called")
     # 1. Delete DATASET_PATH images
-    dataset_path = Path(constants.DATASET_PATH)
+    dataset_path = constants.DATASET_PATH
     if dataset_path.exists():
         shutil.rmtree(dataset_path)
-    result_path = Path(constants.RESULT_PATH)
+    result_path = constants.RESULT_PATH
     if result_path.exists():
         shutil.rmtree(result_path)
 
@@ -82,4 +85,4 @@ def save_images(
         mask_dir = dataset_path / "train" / "mask"
         save_images_to_dir(mask_images, mask_dir)
 
-    print("save_images finished")
+    logger.debug("save_images finished")
