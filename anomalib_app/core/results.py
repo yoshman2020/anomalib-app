@@ -47,9 +47,10 @@ def create_result_data(predictions, threshold):
     # 初期化
     init_results()
     st.session_state["str_threshold"] = f"しきい値: {threshold:.5f}"
-    st.session_state["train_images_used"] = copy.deepcopy(
-        st.session_state["train_images"]
-    )
+    if not st.session_state["chk_model_file"]:
+        st.session_state["train_images_used"] = copy.deepcopy(
+            st.session_state["train_images"]
+        )
     st.session_state["test_images_used"] = copy.deepcopy(
         st.session_state["test_images"]
     )
