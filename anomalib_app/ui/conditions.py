@@ -132,14 +132,13 @@ def configure_conditions(tab_conditions) -> bool:
                 key="threshold_auto",
                 value=True,
                 help="正常画像をもとにしきい値を推定します。",
-                disabled=chk_model_file,
             )
         with col_sizes_2:
             st.number_input(
                 "しきい値",
                 format="%0.5f",
                 key="threshold",
-                disabled=chk_model_file or threshold_auto,
+                disabled=threshold_auto,
                 help="指定したしきい値で正常／異常を判定します。",
             )
         with col_sizes_3:
@@ -216,7 +215,7 @@ def configure_conditions(tab_conditions) -> bool:
                 "混同行列（Confusion Matrix）表示",
                 key="chk_disp_confusion_matrix",
                 value=True,
-                help="混同行列を表示します。",
+                help="分類モデルの当たり・ハズレを一覧にした表を表示します。",
                 disabled=chk_model_file or not chk_disp_metrics,
             )
         with col_metrics_3:
@@ -224,7 +223,7 @@ def configure_conditions(tab_conditions) -> bool:
                 "AUROC表示",
                 key="chk_disp_auroc",
                 value=True,
-                help="AUROCを表示します。",
+                help="モデルの性能を表す曲線グラフを表示します。",
                 disabled=chk_model_file or not chk_disp_metrics,
             )
         with col_metrics_4:
@@ -232,7 +231,7 @@ def configure_conditions(tab_conditions) -> bool:
                 "AUPIMO表示",
                 key="chk_disp_aupimo",
                 value=True,
-                help="AUPIMOを表示します。",
+                help="低誤検出領域に注目した異常検知性能の曲線グラフを表示します。",
                 disabled=chk_model_file or not chk_disp_metrics,
             )
 

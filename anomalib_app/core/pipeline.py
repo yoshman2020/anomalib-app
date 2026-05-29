@@ -1,4 +1,6 @@
+import copy
 import logging
+import shutil
 import time
 from pathlib import Path
 
@@ -112,7 +114,25 @@ def main_page(
                 predictions = engine.predict(
                     model=model, dataset=folder_dataset_test
                 )
-                threshold = loaded_model["threshold"]
+                if st.session_state["threshold_auto"]:
+                    logger.debug(
+                        "Calculating threshold automatically from model file..."
+                    )
+                    # モデルファイルからしきい値を取得
+                    threshold = loaded_model["threshold"]
+                else:
+                    # 入力したしきい値
+                    threshold = st.session_state["threshold"]
+
+                # モデルファイルをコピー
+                exported_model = copy.deepcopy(loaded_model)
+                # しきい値をモデルファイルに保存
+                exported_model["threshold"] = threshold
+                Path(constants.MODEL_PATH).parent.mkdir(parents=True, exist_ok=True)
+                torch.save(exported_model, constants.MODEL_PATH)
+                logger.debug(
+                    f"Threshold saved to model file: {constants.MODEL_PATH}"
+                )
 
             else:
                 logger.debug(
