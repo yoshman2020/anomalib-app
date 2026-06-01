@@ -18,7 +18,8 @@
             ],
             "justMyCode": false,
             "env": {
-                "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"
+                "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+                "DEBUG_MODE": "True"
             }
         },
         {
