@@ -126,22 +126,22 @@ if (Test-Path $pyinstallerOut) {
 
 # Read-Host "Press Enter to continue"
 
-# 9. ショートカットの作成
-if (Test-Path ".\run_app.exe") {
-    $shortcutPath = Join-Path $distBuildDir "run_app.lnk"
-    if (Test-Path $shortcutPath) {
-        Remove-Item -Path $shortcutPath -Force -ErrorAction SilentlyContinue
-    }
-    $WScriptShell = New-Object -ComObject WScript.Shell
-    $shortcut = $WScriptShell.CreateShortcut($shortcutPath)
-    $shortcut.TargetPath = Join-Path $distBuildDir "run_app.exe"
-    $shortcut.WindowStyle = 7 # 最小化で起動
-    $shortcut.IconLocation = "C:\Windows\System32\shell32.dll,251"
-    $shortcut.WorkingDirectory = $distBuildDir
-    $shortcut.Save()
-} else {
-    Write-Error "run_app.exe not found."
-}
+# # 9. ショートカットの作成
+# if (Test-Path ".\run_app.exe") {
+#     $shortcutPath = Join-Path $distBuildDir "run_app.lnk"
+#     if (Test-Path $shortcutPath) {
+#         Remove-Item -Path $shortcutPath -Force -ErrorAction SilentlyContinue
+#     }
+#     $WScriptShell = New-Object -ComObject WScript.Shell
+#     $shortcut = $WScriptShell.CreateShortcut($shortcutPath)
+#     $shortcut.TargetPath = Join-Path $distBuildDir "run_app.exe"
+#     $shortcut.WindowStyle = 7 # 最小化で起動
+#     $shortcut.IconLocation = "C:\Windows\System32\shell32.dll,251"
+#     $shortcut.WorkingDirectory = $distBuildDir
+#     $shortcut.Save()
+# } else {
+#     Write-Error "run_app.exe not found."
+# }
 
-# 10. アプリの実行
-Start-Process -FilePath $shortcutPath
+# # 10. アプリの実行
+# Start-Process -FilePath $shortcutPath

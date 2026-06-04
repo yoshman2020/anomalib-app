@@ -4,7 +4,6 @@ import streamlit as st
 
 from anomalib_app.core import constants
 from anomalib_app.core.config_utils import get_config
-from anomalib_app.core.pipeline import main_page
 from anomalib_app.ui.conditions import configure_conditions
 from anomalib_app.ui.footer import disp_footer
 from anomalib_app.ui.metrics_ui import disp_metrics_about_button
@@ -19,7 +18,9 @@ def main():
     This function initializes the tab_conditions configuration and the main page layout.
     It retrieves the user inputs from the tab_conditions, and passes them to the main page function.
     The main page function then generates images based on these inputs.
-    """
+    """    
+    from anomalib_app.core.pipeline import main_page
+    
     config = get_config()
 
     level_str = config.get("log_level", "INFO")

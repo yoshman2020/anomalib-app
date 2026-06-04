@@ -3,19 +3,28 @@ import logging
 from typing import Any
 
 import timm
+from anomalib import PrecisionType
 from anomalib.metrics import Evaluator
 from anomalib.models import (
+    AnomalyVFM,
+    AnomalyDINO,
     Cfa,
+    CFM,
     Cflow,
     Csflow,
     Dfkde,
     Dfm,
+    Dinomaly,
     Draem,
     Dsr,
     EfficientAd,
+    InpFormer,
     Fastflow,
     Fre,
     Ganomaly,
+    Glass,
+    GeneralAD,
+    L2BT,
     Padim,
     Patchcore,
     ReverseDistillation,
@@ -115,7 +124,14 @@ def get_model(
         ValueError: If an unknown model name is provided.
     """
 
-    if backbone is None or backbone in ["", "mcait"]:
+    if backbone is None or backbone in [
+        "",
+        "mcait",
+        "dinov2_vit_small_14",
+        "vit_base_patch8_224.dino",
+        "dinov2reg_vit_base_14",
+        "vit_large_patch14_dinov2.lvd142m",
+    ]:
         layers = []
     else:
         feature_model = timm.create_model(backbone, features_only=True)
@@ -133,7 +149,28 @@ def get_model(
     visualizer = False
 
     # ----- モデル構築 -----
-    if model_name == "CFA":
+    if model_name == "AnomalyVFM":
+        model = AnomalyVFM(
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+            precision=PrecisionType.FLOAT32,
+        )
+    elif model_name == "AnomalyDINO":
+        model = AnomalyDINO(
+            num_neighbours=1,
+            encoder_name=backbone,
+            masking=False,
+            coreset_subsampling=False,
+            sampling_ratio=0.1,
+            precision=PrecisionType.FLOAT32,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
+    elif model_name == "CFA":
         model = Cfa(
             backbone=backbone,
             pre_processor=pre_processor,
@@ -148,6 +185,18 @@ def get_model(
         )
         # max_epochs = 30
         # callbacks = [EarlyStopping(patience=5, monitor="pixel_AUROC", mode="max")]
+    elif model_name == "CFM":
+        model = CFM(
+            lr=0.0001,
+            rgb_backbone=backbone,
+            group_size=128,
+            num_group=1024,
+            pointmae_weights=None,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
     elif model_name == "C-Flow":
         model = Cflow(
             backbone=backbone,
@@ -209,6 +258,22 @@ def get_model(
             score_type="fre",
         )
         # max_epochs = 1
+    elif model_name == "Dinomaly":
+        model = Dinomaly(
+            encoder_name=backbone,
+            bottleneck_dropout=0.2,
+            decoder_depth=8,
+            target_layers=None,
+            fuse_layer_encoder=None,
+            fuse_layer_decoder=None,
+            remove_class_token=False,
+            use_context_recentering=False,
+            precision=PrecisionType.FLOAT32,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
     elif model_name == "DRAEM":
         model = Draem(
             pre_processor=pre_processor,
@@ -247,6 +312,19 @@ def get_model(
             pad_maps=True,
         )
         # max_epochs = 1000
+    elif model_name == "InpFormer":
+        model = InpFormer(
+            encoder_name=backbone,
+            target_layers=None,
+            fuse_layer_encoder=None,
+            fuse_layer_decoder=None,
+            remove_class_token=True,
+            inp_num=6,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
     elif model_name == "FastFlow":
         model = Fastflow(
             backbone=backbone,
@@ -296,6 +374,70 @@ def get_model(
         )
         # max_epochs = 100
         # callbacks = [EarlyStopping(monitor="image_AUROC", mode="max")]
+    elif model_name == "Glass":
+        model = Glass(
+            input_shape=(288, 288),
+            anomaly_source_path=None,
+            backbone=backbone,
+            pretrain_embed_dim=1536,
+            target_embed_dim=1536,
+            patchsize=3,
+            patchstride=1,
+            pre_trained=True,
+            layers=None,
+            pre_projection=1,
+            discriminator_layers=2,
+            discriminator_hidden=1024,
+            learning_rate=0.0001,
+            step=20,
+            svd=0,
+            gaussian_noise_std=0.015,
+            radius_quantile=0.75,
+            focal_loss_quantile_threshold=0.5,
+            mining=True,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
+    elif model_name == "GeneralAD":
+        model = GeneralAD(
+            backbone=backbone,
+            layers=(24,),
+            hidden_dim=2048,
+            lr=0.0005,
+            lr_decay_factor=0.2,
+            weight_decay=0.00001,
+            epochs=160,
+            noise_std=0.25,
+            dsc_layers=1,
+            dsc_heads=4,
+            dsc_dropout=0.1,
+            num_fake_patches=-1,
+            fake_feature_type="random",
+            top_k=10,
+            pre_trained=True,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
+    elif model_name == "L2BT":
+        model = L2BT(
+            lr=0.0001,
+            layers=(7, 11),
+            blur_w_l=5,
+            blur_w_u=7,
+            blur_pad_l=2,
+            blur_pad_u=3,
+            blur_repeats_l=5,
+            blur_repeats_u=3,
+            topk_ratio=0.001,
+            pre_processor=pre_processor,
+            post_processor=post_processor,
+            evaluator=evaluator,
+            visualizer=visualizer,
+        )
     elif model_name == "PaDiM":
         model = Padim(
             backbone=backbone,

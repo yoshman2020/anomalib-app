@@ -77,7 +77,7 @@ def configure_conditions(tab_conditions) -> bool:
                 model_name = st.selectbox(
                     "検査手法",
                     options=constants.MODEL_NAMES,
-                    index=12,
+                    index=15,
                     key="model_name",
                     disabled=chk_model_file,
                 )
