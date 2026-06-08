@@ -7,12 +7,12 @@ from pathlib import Path
 import numpy as np
 import streamlit as st
 import torch
-from anomalib.data import Folder, FolderDataset
+from anomalib.data import Folder, Folder3D, FolderDataset
 from anomalib.data.utils import ValSplitMode
 from anomalib.deploy import ExportType
 from anomalib.engine.engine import Engine
 from anomalib.metrics import F1AdaptiveThreshold
-from anomalib.models import VlmAd, WinClip
+from anomalib.models import CFM, AnomalyVFM, VlmAd, WinClip
 from streamlit.delta_generator import DeltaGenerator
 from streamlit.elements.lib.mutable_tab_container import TabContainer
 
@@ -128,7 +128,9 @@ def main_page(
                 exported_model = copy.deepcopy(loaded_model)
                 # しきい値をモデルファイルに保存
                 exported_model["threshold"] = threshold
-                Path(constants.MODEL_PATH).parent.mkdir(parents=True, exist_ok=True)
+                Path(constants.MODEL_PATH).parent.mkdir(
+                    parents=True, exist_ok=True
+                )
                 torch.save(exported_model, constants.MODEL_PATH)
                 logger.debug(
                     f"Threshold saved to model file: {constants.MODEL_PATH}"
@@ -153,39 +155,80 @@ def main_page(
                         f"Abnormal images provided. Using them for training. root={constants.DATASET_PATH}"
                     )
                     # 異常画像が選択されている場合
-                    datamodule = Folder(
-                        name="custom",
-                        root=constants.DATASET_PATH,
-                        # abnormal_dirとnormal_test_dirのデータがvalになる
-                        normal_dir=Path("train") / "normal",
-                        abnormal_dir=Path("train") / "abnormal",
-                        mask_dir=Path("train") / "mask",
-                        normal_test_dir=Path("train") / "normal",
-                        val_split_mode=ValSplitMode.SAME_AS_TEST,
-                        train_batch_size=batch_size,
-                        eval_batch_size=batch_size,
-                        num_workers=num_workers,
-                    )
+                    if isinstance(model, CFM):
+                        # CFMの場合は3Dモデル使用
+                        datamodule = Folder3D(
+                            name="custom",
+                            root=constants.DATASET_PATH,
+                            # abnormal_dirとnormal_test_dirのデータがvalになる
+                            normal_dir=Path("train") / "normal",
+                            abnormal_dir=Path("train") / "abnormal",
+                            mask_dir=Path("train") / "mask",
+                            # TODO 3Dモデル
+                            # normal_depth_dir=Path("depth") / "normal",
+                            # abnormal_depth_dir=Path("depth") / "abnormal",
+                            # normal_test_depth_dir=Path("depth") / "test",
+                            normal_test_dir=Path("train") / "normal",
+                            val_split_mode=ValSplitMode.SAME_AS_TEST,
+                            train_batch_size=batch_size,
+                            eval_batch_size=batch_size,
+                            num_workers=num_workers,
+                        )
+                    else:
+                        datamodule = Folder(
+                            name="custom",
+                            root=constants.DATASET_PATH,
+                            # abnormal_dirとnormal_test_dirのデータがvalになる
+                            normal_dir=Path("train") / "normal",
+                            abnormal_dir=Path("train") / "abnormal",
+                            mask_dir=Path("train") / "mask",
+                            normal_test_dir=Path("train") / "normal",
+                            val_split_mode=ValSplitMode.SAME_AS_TEST,
+                            train_batch_size=batch_size,
+                            eval_batch_size=batch_size,
+                            num_workers=num_workers,
+                        )
                 else:
                     logger.debug(
                         f"No abnormal images provided. Training with only normal images. root={constants.DATASET_PATH}"
                     )
                     # 異常画像が選択されていない場合
-                    datamodule = Folder(
-                        name="custom",
-                        root=constants.DATASET_PATH,
-                        normal_dir=Path("train") / "normal",
-                        normal_test_dir="test",
-                        # test_split_mode=TestSplitMode.SYNTHETIC,
-                        # val_split_mode=ValSplitMode.SYNTHETIC,
-                        val_split_mode=ValSplitMode.FROM_TRAIN,
-                        # 検証データを入れるとスコアが1か0になるため、検証はしない
-                        # ratioを0にするとデフォルト値で分割されるため、非常に小さい値を設定
-                        val_split_ratio=0.0001,
-                        train_batch_size=batch_size,
-                        eval_batch_size=batch_size,
-                        num_workers=num_workers,
-                    )
+                    if isinstance(model, CFM):
+                        datamodule = Folder3D(
+                            name="custom",
+                            root=constants.DATASET_PATH,
+                            normal_dir=Path("train") / "normal",
+                            # TODO 3Dモデル
+                            # normal_depth_dir=Path("depth") / "normal",
+                            # abnormal_depth_dir=Path("depth") / "abnormal",
+                            # normal_test_depth_dir=Path("depth") / "test",
+                            normal_test_dir="test",
+                            # test_split_mode=TestSplitMode.SYNTHETIC,
+                            # val_split_mode=ValSplitMode.SYNTHETIC,
+                            val_split_mode=ValSplitMode.FROM_TRAIN,
+                            # 検証データを入れるとスコアが1か0になるため、検証はしない
+                            # ratioを0にするとデフォルト値で分割されるため、非常に小さい値を設定
+                            val_split_ratio=0.0001,
+                            train_batch_size=batch_size,
+                            eval_batch_size=batch_size,
+                            num_workers=num_workers,
+                        )
+                    else:
+                        datamodule = Folder(
+                            name="custom",
+                            root=constants.DATASET_PATH,
+                            normal_dir=Path("train") / "normal",
+                            normal_test_dir="test",
+                            # test_split_mode=TestSplitMode.SYNTHETIC,
+                            # val_split_mode=ValSplitMode.SYNTHETIC,
+                            val_split_mode=ValSplitMode.FROM_TRAIN,
+                            # 検証データを入れるとスコアが1か0になるため、検証はしない
+                            # ratioを0にするとデフォルト値で分割されるため、非常に小さい値を設定
+                            val_split_ratio=0.0001,
+                            train_batch_size=batch_size,
+                            eval_batch_size=batch_size,
+                            num_workers=num_workers,
+                        )
                 datamodule.setup()
 
                 logger.debug("Training model...")
@@ -224,10 +267,16 @@ def main_page(
                         st.session_state["threshold_auto"]
                         or st.session_state["chk_disp_metrics"]
                     ):
-                        train_predictions = engine.predict(
-                            model=model,
-                            dataloaders=datamodule.val_dataloader(),
-                        )
+                        if isinstance(model, AnomalyVFM):
+                            # AnomalyVFMの場合はそのままdatamoduleを渡す
+                            train_predictions = engine.predict(
+                                model=model, datamodule=datamodule
+                            )
+                        else:
+                            train_predictions = engine.predict(
+                                model=model,
+                                dataloaders=datamodule.val_dataloader(),
+                            )
                         st.session_state["train_predictions"] = (
                             train_predictions
                         )
@@ -267,7 +316,9 @@ def main_page(
                                 adaptiveThreshold.update(batch)  # type: ignore
                             threshold = adaptiveThreshold.compute()
                         except Exception as e:
-                            logger.exception("Exception from F1AdaptiveThreshold: %s", e)
+                            logger.exception(
+                                "Exception from F1AdaptiveThreshold: %s", e
+                            )
                             train_scores = [
                                 get_item(prediction, "pred_score")
                                 for prediction in (train_predictions or [])
@@ -301,21 +352,31 @@ def main_page(
                     logger.debug(f"threshold from user input: {threshold}")
 
                 # しきい値をモデルファイルに保存
-                exported_model = torch.load(
-                    constants.MODEL_PATH, weights_only=False
-                )
-                exported_model["threshold"] = threshold
-                torch.save(exported_model, constants.MODEL_PATH)
-                logger.debug(
-                    f"Threshold saved to model file: {constants.MODEL_PATH}"
-                )
+                if Path.exists(constants.MODEL_PATH):
+                    try:
+                        exported_model = torch.load(
+                            constants.MODEL_PATH, weights_only=False
+                        )
+                        exported_model["threshold"] = threshold
+                        torch.save(exported_model, constants.MODEL_PATH)
+                        logger.debug(
+                            f"Threshold saved to model file: {constants.MODEL_PATH}"
+                        )
+                    except Exception as e:
+                        logger.exception(
+                            "Error saving threshold to model file: %s", e
+                        )
 
                 # 予想
-                if isinstance(model, WinClip) or isinstance(model, VlmAd):
+                if (
+                    isinstance(model, AnomalyVFM)
+                    or isinstance(model, WinClip)
+                    or isinstance(model, VlmAd)
+                ):
                     logger.debug(
-                        f"Model is WinClip or VlmAd, using Folder dataset for prediction... root={constants.DATASET_PATH}"
+                        f"Model is AnomalyVFM or WinClip or VlmAd, using Folder dataset for prediction... root={constants.DATASET_PATH}"
                     )
-                    # VLM-AD、WinClipはFolderDatasetに対応していないためFolderで再度読み込み
+                    # AnomalyVFM、VLM-AD、WinClipはFolderDatasetに対応していないためFolderで再度読み込み
                     datamodule_test = Folder(
                         name="custom_test",
                         root=constants.DATASET_PATH,

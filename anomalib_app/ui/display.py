@@ -107,7 +107,7 @@ def disp_session_images(
 
     with download_button_container:
 
-        col_button1, col_button2, _ = st.columns([1, 1, 10])
+        col_button1, col_button2, col_button3 = st.columns([1, 1, 10])
 
         # 保存ボタン
         zip_path = constants.RESULT_PATH / "result.zip"
@@ -122,13 +122,23 @@ def disp_session_images(
 
         # モデル保存ボタン
         if constants.MODEL_PATH.exists():
-            with col_button2:
-                st.download_button(
-                    "モデル保存",
-                    data=constants.MODEL_PATH.read_bytes(),
-                    file_name="model.pt",
-                    on_click="ignore",
-                )
+            # ファイルサイズ
+            file_size_bytes = constants.MODEL_PATH.stat().st_size
+            if file_size_bytes > 200 * 1024 * 1024:
+                # 200MBを超える場合はエラー
+                with col_button3:
+                    st.write("指定した条件ではモデル保存できません。")
+            else:
+                with col_button2:
+                    st.download_button(
+                        "モデル保存",
+                        data=constants.MODEL_PATH.read_bytes(),
+                        file_name="model.pt",
+                        on_click="ignore",
+                    )
+        else:
+            with col_button3:
+                st.write("指定した条件ではモデル保存できません。")
 
     logger.debug("disp_session_images finished")
 

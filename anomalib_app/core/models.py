@@ -6,10 +6,11 @@ import timm
 from anomalib import PrecisionType
 from anomalib.metrics import Evaluator
 from anomalib.models import (
-    AnomalyVFM,
-    AnomalyDINO,
-    Cfa,
     CFM,
+    L2BT,
+    AnomalyDINO,
+    AnomalyVFM,
+    Cfa,
     Cflow,
     Csflow,
     Dfkde,
@@ -18,13 +19,12 @@ from anomalib.models import (
     Draem,
     Dsr,
     EfficientAd,
-    InpFormer,
     Fastflow,
     Fre,
     Ganomaly,
-    Glass,
     GeneralAD,
-    L2BT,
+    Glass,
+    InpFormer,
     Padim,
     Patchcore,
     ReverseDistillation,
@@ -312,7 +312,7 @@ def get_model(
             pad_maps=True,
         )
         # max_epochs = 1000
-    elif model_name == "InpFormer":
+    elif model_name == "INP-Former":
         model = InpFormer(
             encoder_name=backbone,
             target_layers=None,

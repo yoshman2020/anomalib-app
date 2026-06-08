@@ -38,7 +38,7 @@ def configure_conditions(tab_conditions) -> bool:
             )
         with col_model_file_2:
             st.file_uploader(
-                "モデル選択",
+                "モデルファイル選択",
                 type=["pt"],
                 accept_multiple_files=False,
                 key="model_file",
@@ -77,7 +77,7 @@ def configure_conditions(tab_conditions) -> bool:
                 model_name = st.selectbox(
                     "検査手法",
                     options=constants.MODEL_NAMES,
-                    index=15,
+                    index=19,
                     key="model_name",
                     disabled=chk_model_file,
                 )

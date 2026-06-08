@@ -26,17 +26,16 @@ COLUMN_HEIGHT_RESULT = 350
 
 # 検査手法リスト
 MODEL_NAMES = [
-    # TODO
     # # 0 # △推論時間長め # 視覚基盤モデルを活用した教師なし異常検知モデル(Anomaly Vision Foundation Model)
     # # backboneなし
-    # "AnomalyVFM",
+    "AnomalyVFM",
     # 1 # △推論時間長め # DINOv2特徴表現を利用した異常検知モデル(Anomaly Detection with DINO)
     # "dinov2_vit_small_14"
     "AnomalyDINO",
     # 2 # △一般に高速（データ規模依存） # 観測変数の因子構造を検証する統計的手法(Continuous Flow Analysis)
     # SUPPORTED_BACKBONES = ("vgg19_bn", "resnet18", "wide_resnet50_2", "efficientnet_b5")
     "CFA",
-    # TODO
+    # TODO 3Dモデル
     # # 3 # △アプローチ・条件で異なる # Vision Transformer特徴とフローマッチングを組み合わせた異常検知モデル(Conditional Flow Matching)
     # # "vit_base_patch8_224.dino"
     # "CFM",
@@ -61,10 +60,9 @@ MODEL_NAMES = [
     # 11 # ◎非常に高速 # 計算効率重視の異常検知アルゴリズム(Efficient Anomaly Detection)
     # backboneなし
     "Efficient AD",
-    # TODO
     # # 12 # △推論時間長め # 補完学習を利用したTransformerベース異常検知モデル(Inpainting Transformer)
     # # "dinov2reg_vit_base_14"
-    # "InpFormer",
+    "INP-Former",
     # 13 # ◯GPU推論で高速 # 高速流ベース生成による異常検知法
     # SUPPORTED_BACKBONES = ("cait_m48_448", "deit_base_distilled_patch16_384", "resnet18", "wide_resnet50_2")
     "FastFlow",
@@ -76,14 +74,12 @@ MODEL_NAMES = [
     # 16 # ◯高速 # ガラス状欠陥検査向けに設計された異常検知モデル(Glass Surface Anomaly Detection)
     # "wide_resnet50_2"
     "Glass",
-    # TODO
     # 17 # ×時間がかかる # 汎用視覚基盤モデルを利用した異常検知モデル(General Anomaly Detection)
     # "vit_large_patch14_dinov2.lvd142m"
-    # "GeneralAD",
-    # TODO
+    "GeneralAD",
     # # 18 # △推論時間長め # Local-to-Global双方向Transformerによる異常検知モデル(Local-to-Bidirectional Transformer)
     # # backboneなし
-    # "L2BT",
+    "L2BT",
     # 19 # △構造や実装でばらつきあり # 多変量分布で特徴空間の異常を検出するモデル(Patch Distribution Modeling)
     "PaDiM",
     # 20 # ◎非常に高速 # 高次元特徴空間におけるパッチベースの異常検知モデル
@@ -199,7 +195,7 @@ MODEL_BACKBONES = {
     "DRAEM": [],
     "DSR": [],
     "Efficient AD": [],
-    "InpFormer": ["dinov2reg_vit_base_14"],
+    "INP-Former": ["dinov2reg_vit_base_14"],
     "FastFlow": [
         "cait_m48_448",
         "deit_base_distilled_patch16_384",
@@ -236,7 +232,7 @@ ABOUT_MODEL_NAMES = {
         "DRAEM",
         "DSR",
         "Efficient AD",
-        "InpFormer",
+        "INP-Former",
         "FastFlow",
         "FRE",
         "GANomaly",
