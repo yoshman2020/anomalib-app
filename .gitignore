@@ -217,3 +217,5 @@ build/
 *.c
 _internal/
 dist_prep/
+.agents/
+.claude/
